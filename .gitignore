@@ -3,3 +3,6 @@
 ################################################################################
 
 /Motives.WebTest.API/bin/Debug/netcoreapp3.1
+/Motives.WebTest.API/obj
+/Motives.WebTest.BackEnd/bin/Debug/netcoreapp3.1
+/Motives.WebTest.BackEnd/obj
