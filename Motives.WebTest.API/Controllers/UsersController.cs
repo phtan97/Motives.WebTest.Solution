@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 namespace Motives.WebTest.API.Controllers
 {
     [ApiController]
+    [Route("api/[controller]")]
     [Authorize]
     public class UsersController : ControllerBase
     {
@@ -26,7 +27,7 @@ namespace Motives.WebTest.API.Controllers
         }
 
         [HttpPut]
-        [Route("api/users/update")]
+        [Route("update")]
         public async Task<IActionResult> UpdateUser([FromBody] UserRegisterModel userUpdate)
         {
             try
@@ -37,6 +38,57 @@ namespace Motives.WebTest.API.Controllers
                     return Ok(response.Message);
                 }
                 return BadRequest(response.Message);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError("exception", ex);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+        }
+        
+        [HttpGet]
+        [Route("get")]
+        public async Task<IActionResult> GetUsers()
+        {
+            try
+            {
+                return Ok(await _iuserService.GetUsers());
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError("exception", ex);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpPost]
+        [Route("insert")]
+        public async Task<IActionResult> InsertUser([FromBody] UserRegisterModel userRegister)
+        {
+            try
+            {
+                var response = await _iuserService.UserRegister(userRegister);
+                if (response.Status == EStatusModel.Success)
+                {
+                    return Ok(response.Message);
+                }
+                return BadRequest(response.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("exception", ex);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpDelete]
+        [Route("delete/{id}")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            try
+            {
+                var response = await _iuserService.UserDelete(id);
+                return Ok(response);
             }
             catch(Exception ex)
             {

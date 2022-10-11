@@ -1,0 +1,82 @@
+﻿@using Motives.WebTest.BackEnd.Models
+@model TableUser[];
+
+<button type="button" class="btn btn-info" id="NewUser">New User</button>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Action</th>
+            <th scope="col">User Name</th>
+            <th scope="col">Email Address</th>
+            <th scope="col">Phone Number</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <th scope="row">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Action
+                        </button>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-item" href="#">Update</div>
+                            <a add onclick="DeleteUser(@item.Id)" href="#" class="dropdown-item">Delete</a>
+                        </div>
+                    </div>
+                </th>
+                <td>@item.Username</td>
+                <td>@item.Email</td>
+                <td>@item.Phone</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="modal" tabindex="-1" role="dialog" id="modal-register">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Modal body text goes here.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function DeleteUser(id) {
+        Swal.fire({
+        title: "Are you sure about delete this user?",
+        text: "",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
+    }).then((result) => {
+        if (result.value) {
+            $.ajax({
+                url: "User/DeleteUser",
+                type: 'DELETE',
+                data: {
+                    idUser: id
+                },
+                success: function (result) {
+                    alert(result.Message);
+                    window.location.reload();
+                }
+            })
+        }
+    })
+    }
+</script>

@@ -1,9 +1,13 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Motives.WebTest.BackEnd.Interfaces;
+using Motives.WebTest.BackEnd.Models;
+using Motives.WebTest.BackEnd.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +27,16 @@ namespace Motives.WebTest.BackEnd
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IUserService, UserService>();
+            services.AddSingleton<IContextService, ContextService>();
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromHours(3);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+            EngineContext.SetServiceProvider(services.BuildServiceProvider());
             services.AddControllersWithViews();
         }
 
@@ -45,6 +59,8 @@ namespace Motives.WebTest.BackEnd
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {

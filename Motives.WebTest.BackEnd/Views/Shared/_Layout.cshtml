@@ -6,6 +6,7 @@
     <title>@ViewData["Title"] - Motives.WebTest.BackEnd</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <link href="~/lib/sweetaleart2/sweetalert2.min.css" rel="stylesheet" />
 </head>
 <body>
     <header>
@@ -43,6 +44,32 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/lib/sweetaleart2/sweetalert2.min.js"></script>
     @RenderSection("Scripts", required: false)
+    <script>
+        $('#RegisterUser').on('click', function () {
+            var username = $('#registerUsername').val();
+            var password = $('#registerPassword').val();
+            var name = $('#registerName').val();
+            var subname = $('#subName').val();
+            var email = $('#registerEmail').val();
+            var phone = $('#registerPhone').val();
+            $.ajax({
+                url: "Home/Register",
+                type: "POST",
+                data: {
+                    Username: username,
+                    Password: password,
+                    Name: name,
+                    SubName: subname,
+                    Email: email,
+                    Phone: phone
+                },
+                success: function (response) {
+                    alert(response.Message);
+                }
+            });
+        });
+    </script>
 </body>
 </html>

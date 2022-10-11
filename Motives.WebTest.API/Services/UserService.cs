@@ -44,7 +44,7 @@ namespace Motives.WebTest.API.Services
             }
         }
 
-        public Task<ResponseModel> UserLogin(UserLoginModel userLogin)
+        public Task<UserResponse> UserLogin(UserLoginModel userLogin)
         {
             try
             {
@@ -52,10 +52,13 @@ namespace Motives.WebTest.API.Services
                 using (var db = new DatabaseContext())
                 {
                     var user = db.TableUsers.FirstOrDefault(x => x.Username.Equals(userLogin.Username));
-                    if (user == null) return Task.FromResult(new ResponseModel()
+                    if (user == null) return Task.FromResult(new UserResponse
                     {
-                        Status = EStatusModel.Failed,
-                        Message = "Account is not existed in system"
+                        ResponseModel = new ResponseModel
+                        {
+                            Status = EStatusModel.Failed,
+                            Message = "Account is not existed in system"
+                        }
                     });
                     var password = Convert.ToBase64String(KeyDerivation.Pbkdf2(
                                     password: userLogin.Password,
@@ -63,15 +66,26 @@ namespace Motives.WebTest.API.Services
                                     prf: KeyDerivationPrf.HMACSHA256,
                                     iterationCount: 100000,
                                     numBytesRequested: 256 / 8));
-                    if (!password.Equals(user.Password)) return Task.FromResult(new ResponseModel
+                    if (!password.Equals(user.Password)) return Task.FromResult(new UserResponse
                     {
-                        Status = EStatusModel.Failed,
-                        Message = "Password is incorrect"
+                        ResponseModel = new ResponseModel
+                        {
+                            Status = EStatusModel.Failed,
+                            Message = "Password is incorrect"
+                        }
                     });
-                    return Task.FromResult(new ResponseModel
+                    return Task.FromResult(new UserResponse
                     {
-                        Status = EStatusModel.Success,
-                        Message = "Log in success"
+                        ResponseModel = new ResponseModel
+                        {
+                            Status = EStatusModel.Success,
+                            Message = "Log in success"
+                        },
+                        UserName = user.Username,
+                        Name = user.Name,
+                        SubName = user.SubName,
+                        Phone = user.Phone,
+                        Email = user.Email
                     });
                 }
             }
@@ -164,6 +178,21 @@ namespace Motives.WebTest.API.Services
                         Status = EStatusModel.Failed,
                         Message = "Update user failed"
                     });
+                }
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public Task<TableUser[]> GetUsers()
+        {
+            try
+            {
+                using(var db = new DatabaseContext())
+                {
+                    return Task.FromResult(db.TableUsers.ToArray());
                 }
             }
             catch(Exception ex)

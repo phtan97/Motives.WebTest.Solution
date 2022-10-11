@@ -35,13 +35,13 @@ namespace Motives.WebTest.API.Controllers
         }
 
         [HttpPost]
-        [Route("api/user/login")]
+        [Route("user/login")]
         public async Task<IActionResult> Login([FromBody] UserLoginModel userLogin)
         {
             try
             {
                 var user = await _iuserService.UserLogin(userLogin);
-                if (user.Status == EStatusModel.Success)
+                if (user.ResponseModel.Status == EStatusModel.Success)
                 {
                     var authClaims = new List<Claim>
                     {
@@ -55,13 +55,14 @@ namespace Motives.WebTest.API.Controllers
                         expires: DateTime.Now.AddHours(3),
                         claims: authClaims,
                         signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256));
-                    return Ok(new
+                    user.AuthenToken = new AuthenToken
                     {
-                        token = new JwtSecurityTokenHandler().WriteToken(token),
-                        expiration = token.ValidTo
-                    });
+                        Token = new JwtSecurityTokenHandler().WriteToken(token),
+                        Expiration = token.ValidTo
+                    };
+                    return Ok(user);
                 }
-                return Unauthorized(user.Message);
+                return Unauthorized(user.ResponseModel.Message);
             }
             catch (Exception ex)
             {
@@ -71,7 +72,7 @@ namespace Motives.WebTest.API.Controllers
         }
 
         [HttpPost]
-        [Route("api/user/register")]
+        [Route("user/register")]
         public async Task<IActionResult> Register([FromBody] UserRegisterModel userRegister)
         {
             try
